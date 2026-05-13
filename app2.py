@@ -5,11 +5,11 @@ from tinydb import TinyDB, Query
 from werkzeug.utils import secure_filename
 
 
-app = Flask(name, template_folder="templates2")
+app = Flask(__name__, template_folder="template2")
 app.secret_key = "Leave_no_one_alive"
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
-BAZE
+#BAZE
 db = TinyDB("db2.json")
 users = db.table("users")
 posts = db.table("posts")
@@ -64,9 +64,9 @@ def upload():
         # Ustvarimo unikaten ID za objavo, da bo LIKE deloval!
         post_id = str(int(time.time() * 1000)) 
         fname = secure_filename(file.filename)
-        unique_name = f"{postid}{fname}"
+        unique_name = f"{post_id}{fname}"
 
-Prepričaj se, da mapa obstaja
+#Prepričaj se, da mapa obstaja
         if not os.path.exists(app.config['UPLOAD_FOLDER']):
             os.makedirs(app.config['UPLOAD_FOLDER'])
 
@@ -90,7 +90,7 @@ def like_post():
     postid = request.form.get("id")
     uporabnik = session["user"]
 
-preveri, če je ta uporabnik to objavo že všečkal
+#preveri, če je ta uporabnik to objavo že všečkal
     ze_vseckal = likes_db.search((Like.post_id == postid) & (Like.user == uporabnik))
 
 
@@ -122,5 +122,5 @@ def logout():
     return redirect("/login")
 
 
-if name == "main":
+if __name__ == "__main__":
     app.run(debug=True)
