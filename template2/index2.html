@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Moje Omrežje</title>
+    <style>
+        body { font-family: sans-serif; max-width: 500px; margin: auto; background: #fafafa; }
+        .post { background: white; border: 1px solid #dbdbdb; margin: 20px 0; padding: 10px; }
+        .post img { width: 100%; border-radius: 3px; }
+        .nav { display: flex; justify-content: space-between; padding: 10px; background: white; border-bottom: 1px solid #dbdbdb; position: sticky; top: 0; }
+
+        /* Stil za srce */
+        .like-checkbox input { display: none; }
+        .heart-icon { 
+            cursor: pointer; font-size: 1.5rem; filter: grayscale(1); transition: 0.3s; display: inline-block;
+        }
+        .like-checkbox input:checked + .heart-icon { 
+            filter: grayscale(0); transform: scale(1.2);
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <div class="nav">
+        <strong>Pozdravljen, {{ uporabnik }}!</strong>
+        <a href="/logout">Odjava</a>
+    </div>
+
+    <div style="background: white; padding: 15px; border: 1px solid #dbdbdb; margin-top: 10px;">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="slika" accept="image/*" required><br><br>
+            <input type="text" name="opis" placeholder="Napiši nekaj o sliki...">
+            <br><br>
+            <button type="submit" style="width: 100%;">Objavi</button>
+        </form>
+    </div>
+
+    {% for o in objave %}
+    <div class="post">
+        <p><strong>{{ o.avtor }}</strong> <small style="color: gray;">{{ o.cas }}</small></p>
+        <img src="{{ url_for('static', filename='uploads/' + o.slika_url) }}">
+        <p>{{ o.opis }}</p>
+
+        <div class="like-container">
+            <label class="like-checkbox">
+                <!-- data-id nam pove, katero objavo všečkamo -->
+                <input type="checkbox" class="ajax-like" data-id="{{ o.id }}">
+                <span class="heart-icon">❤️</span>
+            </label>
+            <!-- tukaj se bo izpisala številka iz AJAX-a -->
+            <span id="likes-count-{{ o.id }}">{{ o.likes if o.likes else 0 }}</span> všečkov
+        </div>
+    </div>
+    {% endfor %}
+    <br>
+
+    <a href="/logout"> Odjavi me</a>
+<script>
+        // Ta funkcija čaka, da se CELOTNA stran naloži
+        window.onload = function() {
+            if (window.jQuery) { // Preverimo, če je jQuery naložen
+                $(".ajax-like").on("change", function() {
+                    var checkbox = $(this);
+                    var postID = checkbox.data("id");
+
+                    $.ajax({
+                        url: "/like",
+                        method: "POST",
+                        data: { id: postID },
+                        success: function(odgovor) {
+                            $("#likes-count-" + odgovor.id).text(odgovor.new_likes);
+                        }
+                    });
+                });
+            }
+        };
+    </script>
+</body>
+</html>
