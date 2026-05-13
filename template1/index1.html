@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title> Dashboard </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+
+    <!-- za nov zapisek-->
+    <form action="/createNote" method="post">
+        <button type="submit">Nov zapisek</button>
+    </form>
+
+    <!-- za textarea zapiskov -->
+    {% for z in zapiski %}
+    <div style="margin: 10px; border: 1px solid black; padding: 5px;">
+        <textarea id="note-{{ z.id }}">{{ z.note }}</textarea>
+        <button onclick="saveNote('{{ z.id }}')">Shrani</button>
+        <span id="msg-{{ z.id }}"></span>
+    </div>
+    <button onclick="deleteNote('{{ z.id }}')" style="color: red;">Izbriši</button>
+    {% endfor %}
+    <br>
+
+    <a href="/logout"> Odjavi me</a>
+</body>
+</html>
+<script>
+    function saveNote(id) 
+    {
+        var noteText = document.getElementById("note-" + id).value
+        $.ajax
+        ({
+            url: "/saveNote",
+            method: "POST",
+            data: 
+            {
+               id: id, 
+               note: noteText ,
+            },
+            success: function( result ) 
+            {
+                $( "#weather-temp" ).html( "<strong>" + result + "</strong> degrees" );
+            }
+        });
+    }
+    function deleteNote(id) 
+    {
+        $.ajax
+        ({
+            url: "/deleteNote",
+            method: "POST",
+            data: { id: id },
+            success: function() {
+                location.reload(); // Osveži stran da se osvežijo podatki
+            }
+        });
+    }
+
+
+</script>
+login.html
+
+
